@@ -1,0 +1,186 @@
+:root {
+  --bg: #f6f7f4;
+  --surface: #ffffff;
+  --surface-2: #eef0ea;
+  --border: #dfe3d8;
+  --grid: #e8ebe3;
+  --text: #1c211a;
+  --muted: #6b7365;
+  --accent: #2f8f4e;
+  --accent-soft: #e2f2e6;
+  --water: #2f7fd1;
+  --warn: #b7791f;
+  --warn-soft: #fbf0dc;
+  --danger: #c2413a;
+  --danger-soft: #fbe5e3;
+
+  color-scheme: light dark;
+  font-family:
+    Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Ubuntu, Cantarell, sans-serif;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #121512;
+    --surface: #1a1e19;
+    --surface-2: #242a23;
+    --border: #2e352c;
+    --grid: #262c25;
+    --text: #e6eae3;
+    --muted: #8f998a;
+    --accent: #5cc27c;
+    --accent-soft: #1d3324;
+    --water: #5aa5f0;
+    --warn: #e0a548;
+    --warn-soft: #3a2e19;
+    --danger: #ef6b62;
+    --danger-soft: #3c1f1d;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+}
+
+a {
+  color: var(--accent);
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.6rem;
+  letter-spacing: -0.01em;
+}
+
+h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+}
+
+code {
+  font-size: 0.9em;
+  padding: 0.1em 0.3em;
+  border-radius: 4px;
+  background: var(--surface-2);
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+button.primary {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+}
+
+input {
+  padding: 0.45rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+input:focus,
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* Shared page pieces */
+
+.page-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.sub {
+  margin: 0.2rem 0 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.panel {
+  padding: 1rem 1.2rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  margin-bottom: 1rem;
+}
+
+.error {
+  color: var(--danger);
+}
+
+.seg {
+  display: inline-flex;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface-2);
+}
+
+.seg button {
+  padding: 0.25rem 0.7rem;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.seg button.active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.08);
+}
+
+.dot {
+  display: inline-block;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: var(--muted);
+}
+.dot.watering {
+  background: var(--water);
+}
+.dot.rapid_drop {
+  background: var(--warn);
+}
+.dot.dry,
+.dot.offline {
+  background: var(--danger);
+}
+.dot.online {
+  background: var(--accent);
+}

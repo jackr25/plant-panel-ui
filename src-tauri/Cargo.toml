@@ -1,0 +1,25 @@
+[package]
+name = "plant-panel-ui"
+version = "0.1.0"
+description = "Desktop front end for plantd"
+edition = "2024"
+license = "MIT"
+
+[lib]
+# Tauri convention: the app lives in a lib so mobile targets can link it.
+name = "plant_panel_ui_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.7", features = [] }
+
+[dependencies]
+tauri = { version = "2.12", features = [] }
+tauri-plugin-http = "2.8"
+
+[profile.release]
+lto = true
+codegen-units = 1
+opt-level = "s"
+strip = true
+panic = "abort"

@@ -1,0 +1,13 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Main window: talk to plantd over HTTP. The server address is user-configured, so any LAN host is allowed.",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    {
+      "identifier": "http:default",
+      "allow": [{ "url": "http://*:*" }, { "url": "https://*:*" }]
+    }
+  ]
+}
