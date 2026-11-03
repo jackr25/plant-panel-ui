@@ -71,7 +71,8 @@ code {
 }
 
 button,
-input {
+input,
+textarea {
   font: inherit;
   color: inherit;
 }
@@ -99,7 +100,8 @@ button.primary {
   color: #fff;
 }
 
-input {
+input,
+textarea {
   padding: 0.45rem 0.7rem;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -107,6 +109,7 @@ input {
 }
 
 input:focus,
+textarea:focus,
 button:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 1px;

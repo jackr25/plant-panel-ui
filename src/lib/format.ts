@@ -1,4 +1,4 @@
-import type { EventKind, Status } from './icd';
+import type { EventKind, PlantEvent, Status } from './icd';
 
 export const nowS = () => Math.floor(Date.now() / 1000);
 
@@ -62,3 +62,27 @@ export const eventLabel: Record<EventKind, string> = {
   online: 'Back online',
   node_reboot: 'Node rebooted',
 };
+
+/** "Watered 31% → 58%", "Went dry at 29%", "Watered (logged by hand)". */
+export function eventText(e: PlantEvent): string {
+  const detail =
+    e.from_pct != null && e.pct != null
+      ? ` ${pct(e.from_pct, 0)} → ${pct(e.pct, 0)}`
+      : e.pct != null
+        ? ` at ${pct(e.pct, 0)}`
+        : '';
+  return `${eventLabel[e.kind]}${detail}${e.manual ? ' (logged by hand)' : ''}`;
+}
+
+/** Unix seconds as the value of an `<input type="datetime-local">`, in local time. */
+export function toLocalInput(t: number): string {
+  const d = new Date(t * 1000);
+  const p = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+
+/** The inverse of {@link toLocalInput}; `null` if the input is empty or invalid. */
+export function fromLocalInput(v: string): number | null {
+  const ms = new Date(v).getTime();
+  return Number.isNaN(ms) ? null : Math.floor(ms / 1000);
+}

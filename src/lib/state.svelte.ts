@@ -75,6 +75,20 @@ class Live {
     return () => clearInterval(this.#timer);
   }
 
+  /** Swaps in a plant returned by an edit, matched by sensor id (the key may have changed). */
+  replace(p: PlantSummary) {
+    const i = this.plants.findIndex((q) => q.sensor_id === p.sensor_id);
+    if (i >= 0) this.plants[i] = p;
+  }
+
+  /** After a history edit: swap in the returned plant now, then refresh once the
+   * collector's re-analysis has had a moment, which also makes views refetch. */
+  historyChanged(p: PlantSummary) {
+    this.replace(p);
+    this.revision++;
+    setTimeout(() => void this.refresh(), 1500);
+  }
+
   find(key: string): PlantSummary | undefined {
     return this.plants.find((p) => p.key === key || p.sensor_id === key);
   }
@@ -108,6 +122,13 @@ class Router {
 
   constructor() {
     addEventListener('hashchange', () => (this.route = parseHash(location.hash)));
+  }
+
+  /** Swaps the current history entry for `hash` without a navigation, e.g. after a
+   * rename changes the plant's key (the old URL is dead, so Back shouldn't return to it). */
+  replace(hash: string) {
+    history.replaceState(history.state, '', hash);
+    this.route = parseHash(hash);
   }
 }
 

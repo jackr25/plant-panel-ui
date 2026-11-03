@@ -1,9 +1,12 @@
 <script lang="ts">
   import Chart from '../lib/components/Chart.svelte';
   import MoistureBar from '../lib/components/MoistureBar.svelte';
+  import PlantEditor from '../lib/components/PlantEditor.svelte';
+  import PlantPhoto from '../lib/components/PlantPhoto.svelte';
   import StatusBadge from '../lib/components/StatusBadge.svelte';
+  import WateringForm from '../lib/components/WateringForm.svelte';
   import { errorText } from '../lib/api';
-  import { ago, dateTime, eventLabel, nowS, pct, until } from '../lib/format';
+  import { ago, dateTime, eventText, nowS, pct, until } from '../lib/format';
   import type { PlantEvent, Series } from '../lib/icd';
   import { api, href, live } from '../lib/state.svelte';
 
@@ -20,6 +23,8 @@
   let events = $state<PlantEvent[]>([]);
   let error = $state<string | null>(null);
   let to = $state(nowS());
+  let editing = $state(false);
+  let logging = $state(false);
 
   const plant = $derived(live.find(key));
   const from = $derived(to - days * 86_400);
@@ -51,11 +56,29 @@
   <p class="sub">{live.loading ? 'Loading…' : `No plant "${key}".`}</p>
 {:else}
   <header class="page-head">
-    <div>
-      <h1>{plant.name} <StatusBadge status={plant.status} /></h1>
-      <p class="sub">{plant.hostname} · {plant.sensor_id}{plant.rssi != null ? ` · ${plant.rssi} dBm` : ''}</p>
+    <div class="title">
+      <PlantPhoto {plant} size={72} />
+      <div>
+        <h1>{plant.name} <StatusBadge status={plant.status} /></h1>
+        <p class="sub">{plant.hostname} · {plant.sensor_id}{plant.rssi != null ? ` · ${plant.rssi} dBm` : ''}</p>
+      </div>
     </div>
+    {#if !editing && !logging}
+      <div class="head-actions">
+        <button onclick={() => (logging = true)}>Log watering</button>
+        <button onclick={() => (editing = true)}>Edit</button>
+      </div>
+    {/if}
   </header>
+
+  {#if logging}
+    <WateringForm {plant} onclose={() => (logging = false)} />
+  {/if}
+  {#if editing}
+    <PlantEditor {plant} onclose={() => (editing = false)} />
+  {:else if plant.notes}
+    <section class="panel notes">{plant.notes}</section>
+  {/if}
 
   <div class="hero">
     <div class="now">
@@ -138,11 +161,7 @@
           {#each events as e (e.t + e.kind)}
             <li>
               <span class="dot {e.kind}"></span>
-              <span>{eventLabel[e.kind]}{e.from_pct != null && e.pct != null
-                  ? ` ${pct(e.from_pct, 0)} → ${pct(e.pct, 0)}`
-                  : e.pct != null
-                    ? ` at ${pct(e.pct, 0)}`
-                    : ''}</span>
+              <span>{eventText(e)}</span>
               <time class="sub">{dateTime(e.t)}</time>
             </li>
           {/each}
@@ -159,6 +178,20 @@
     display: inline-block;
     margin-bottom: 0.75rem;
     font-size: 0.9rem;
+  }
+  .title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-width: 0;
+  }
+  .head-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .notes {
+    white-space: pre-line;
+    overflow-wrap: anywhere;
   }
   h1 {
     display: flex;

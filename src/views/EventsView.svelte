@@ -1,6 +1,6 @@
 <script lang="ts">
   import { errorText } from '../lib/api';
-  import { dateTime, eventLabel, nowS, pct } from '../lib/format';
+  import { dateTime, eventLabel, eventText, nowS } from '../lib/format';
   import type { EventKind, PlantEvent } from '../lib/icd';
   import { api, href, live } from '../lib/state.svelte';
 
@@ -59,11 +59,7 @@
       <li>
         <span class="dot {e.kind}"></span>
         <a href={href.plant(e.plant)}>{names.get(e.plant) ?? e.plant}</a>
-        <span>{eventLabel[e.kind]}{e.from_pct != null && e.pct != null
-            ? ` ${pct(e.from_pct, 0)} → ${pct(e.pct, 0)}`
-            : e.pct != null
-              ? ` at ${pct(e.pct, 0)}`
-              : ''}</span>
+        <span>{eventText(e)}</span>
         <time class="sub">{dateTime(e.t)}</time>
       </li>
     {/each}

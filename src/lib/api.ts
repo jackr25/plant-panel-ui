@@ -8,14 +8,18 @@ import {
   type Health,
   type PlantEvent,
   type PlantSummary,
+  type PlantUpdate,
   type Report,
   type Series,
+  type WateringEntry,
 } from './icd';
 
 type Fetch = typeof globalThis.fetch;
 type Params = Record<string, string | number | undefined>;
 
 const TIMEOUT_MS = 8000;
+/** Photo uploads can be a few MB over Wi-Fi. */
+const UPLOAD_TIMEOUT_MS = 60_000;
 
 let fetcher: Promise<Fetch> | undefined;
 function getFetch(): Promise<Fetch> {
@@ -51,10 +55,15 @@ export class Client {
     return `${this.base.replace(/\/+$/, '')}${API_PREFIX}${path}${qs ? `?${qs}` : ''}`;
   }
 
-  private async request(path: string, params?: Params, init?: RequestInit): Promise<Response> {
+  private async request(
+    path: string,
+    params?: Params,
+    init?: RequestInit,
+    timeoutMs = TIMEOUT_MS,
+  ): Promise<Response> {
     const f = await getFetch();
     const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+    const timer = setTimeout(() => ctrl.abort(), timeoutMs);
     let res: Response;
     try {
       res = await f(this.url(path, params), { ...init, signal: ctrl.signal });
@@ -92,6 +101,40 @@ export class Client {
   report = () => this.json<Report>('/report.json');
   reportText = () => this.text('/report.txt');
   liveText = () => this.text('/live.txt');
+  /** Returns the updated plant; its `key` changes when the name does. */
+  updatePlant = async (key: string, u: PlantUpdate): Promise<PlantSummary> =>
+    (
+      await this.request(`/plants/${encodeURIComponent(key)}`, undefined, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(u),
+      })
+    ).json();
+  photo = async (key: string): Promise<Blob> =>
+    (await this.request(`/plants/${encodeURIComponent(key)}/photo`)).blob();
+  uploadPhoto = async (key: string, image: Blob): Promise<PlantSummary> =>
+    (
+      await this.request(
+        `/plants/${encodeURIComponent(key)}/photo`,
+        undefined,
+        { method: 'PUT', headers: { 'Content-Type': image.type }, body: image },
+        UPLOAD_TIMEOUT_MS,
+      )
+    ).json();
+  deletePhoto = async (key: string): Promise<PlantSummary> =>
+    (await this.request(`/plants/${encodeURIComponent(key)}/photo`, undefined, { method: 'DELETE' })).json();
+  /** Records a watering the sensor missed. `409` if one is already recorded near `t`. */
+  addWatering = async (key: string, entry: WateringEntry = {}): Promise<PlantSummary> =>
+    (
+      await this.request(`/plants/${encodeURIComponent(key)}/waterings`, undefined, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(entry),
+      })
+    ).json();
+  /** Deletes the plant's samples, events and analysis. Name, notes and photo stay. */
+  clearHistory = async (key: string): Promise<PlantSummary> =>
+    (await this.request(`/plants/${encodeURIComponent(key)}/history`, undefined, { method: 'DELETE' })).json();
   analyze = async () => {
     await this.request('/analyze', undefined, { method: 'POST' });
   };

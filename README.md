@@ -14,7 +14,8 @@ src/
   lib/api.ts            typed client; Tauri HTTP plugin inside the app, fetch in a browser
   lib/state.svelte.ts   server setting, live plant list (60 s refresh), router
   lib/format.ts         time / percent formatting, labels
-  lib/components/       Chart (SVG, no chart lib), PlantCard, MoistureBar, StatusBadge
+  lib/photo.ts          downscale before upload; cached object URLs for plant photos
+  lib/components/       Chart (SVG, no chart lib), PlantCard, PlantEditor, PlantPhoto, ...
   views/                Dashboard, PlantView, EventsView, ReportView, SettingsView
 src-tauri/              minimal Rust shell: window + tauri-plugin-http
 ```
@@ -56,6 +57,10 @@ the Pi too.
   any range is about 300 points. The dashed curve is the fitted drydown model
   projected from the latest reading (`project()` in `icd.ts`, the same formula as
   plantd's).
+- **Plant edits** (name, notes, dry threshold, photo) are stored by plantd, so every
+  instance of the app sees them on its next refresh. Photos are re-encoded to a
+  ≤ 1024 px JPEG before upload and shown from blob URLs, which is why the CSP allows
+  `img-src blob:`.
 - **Icons** in `src-tauri/icons/` are generated placeholders. Replace them with
   `npm run tauri icon path/to/1024.png`.
 - **Windows:** builds natively with `npm run tauri build` (needs WebView2, which ships

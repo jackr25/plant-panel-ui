@@ -58,7 +58,28 @@ export interface PlantSummary {
   forecast: Forecast | null;
   day: DayStats | null;
   history: History | null;
+  /** Free text, may contain newlines. */
+  notes: string | null;
+  /** Fetch from `/plants/{key}/photo`; `updated` changes on every upload. */
+  photo: Photo | null;
 }
+
+export interface Photo {
+  content_type: string;
+  bytes: number;
+  updated: number;
+}
+
+/** `PATCH /plants/{key}`: omit a field to leave it, `null` resets it to the default. */
+export interface PlantUpdate {
+  name?: string | null;
+  notes?: string | null;
+  dry_threshold_pct?: number | null;
+}
+
+export const NAME_MAX_CHARS = 64;
+export const NOTES_MAX_CHARS = 4000;
+export const PHOTO_MAX_BYTES = 4 << 20;
 
 export interface Series {
   sensor_id: string;
@@ -74,6 +95,13 @@ export interface PlantEvent {
   sensor_id: string;
   from_pct?: number;
   pct?: number;
+  /** A watering entered by hand rather than sensed. Absent means false. */
+  manual?: boolean;
+}
+
+/** `POST /plants/{key}/waterings`. Omit `t` for now; it must not be in the future. */
+export interface WateringEntry {
+  t?: number;
 }
 
 export interface Report {

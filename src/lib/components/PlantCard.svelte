@@ -4,6 +4,7 @@
   import { ago, nowS, pct, until } from '../format';
   import Chart from './Chart.svelte';
   import MoistureBar from './MoistureBar.svelte';
+  import PlantPhoto from './PlantPhoto.svelte';
   import StatusBadge from './StatusBadge.svelte';
 
   let { plant }: { plant: PlantSummary } = $props();
@@ -29,6 +30,7 @@
 
 <a class="card" href={href.plant(plant.key)}>
   <header>
+    <PlantPhoto {plant} size={40} />
     <h3>{plant.name}</h3>
     <StatusBadge status={plant.status} />
   </header>
@@ -97,6 +99,8 @@
     gap: 0.5rem;
   }
   h3 {
+    flex: 1;
+    min-width: 0;
     margin: 0;
     font-size: 1rem;
     overflow: hidden;
